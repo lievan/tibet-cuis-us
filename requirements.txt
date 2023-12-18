@@ -1,6 +1,6 @@
 blinker==1.7.0
 click==8.1.7
-Flask==1.1.2
+Flask==2.2.3
 gunicorn==20.0.4
 importlib-metadata==7.0.0
 itsdangerous==2.1.2
