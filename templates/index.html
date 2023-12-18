@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Tibetan Cuisine in the U.S.</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://unpkg.com/intersection-observer@0.5.1/intersection-observer.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+    <style>
+        body {
+            margin:0;
+            padding:0;
+            font-family: Georgia,serif;
+            font-size: 40px;
+        }
+        .head{
+            width: 100%;
+            height: 100vh;
+            margin-bottom: 40px;
+            background-image: url('images/columbia.jpeg');
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            opacity: 1.0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            -webkit-transition: background-image 1.5s linear;
+            -moz-transition: background-image 1.5s linear;
+            -o-transition: background-image 1.5s linear;
+            -ms-transition: background-image 1.5s linear;
+            transition: background-image 1.5s linear;
+        }
+        h1 {
+            width: 725px;
+            border: 25px solid #FFFBED;
+            border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='75' height='75'%3E%3Cg fill='none' stroke='%23B88846' stroke-width='2'%3E%3Cpath d='M1 1h73v73H1z'/%3E%3Cpath d='M8 8h59v59H8z'/%3E%3Cpath d='M8 8h16v16H8zM51 8h16v16H51zM51 51h16v16H51zM8 51h16v16H8z'/%3E%3C/g%3E%3Cg fill='%23B88846'%3E%3Ccircle cx='16' cy='16' r='2'/%3E%3Ccircle cx='59' cy='16' r='2'/%3E%3Ccircle cx='59' cy='59' r='2'/%3E%3Ccircle cx='16' cy='59' r='2'/%3E%3C/g%3E%3C/svg%3E") 25;
+            background-color:#FFFBED;
+            position: static;
+            line-height:2;
+            margin: 0 auto 5px;
+            padding-top: 0;
+            padding-left: 0;
+            clear: none;
+            font-family:  freight-big-pro, serif;
+            font-size: 48px;
+            line-height: 48px;
+            font-weight: 400;
+            text-transform: none;
+        }
+        h2{
+            font-weight:normal;
+        }
+        h3 {
+            font-family: freight-big-pro, serif;
+            font-size: x-large;;
+        }
+        h4 {
+            font-size: medium;
+        }
+
+        body, html {
+            height: 100%;
+        }
+
+        #map {
+            top:0;
+            height: 100vh;
+            width:100vw;
+            position: fixed;
+        }
+        #header {
+            margin: auto;
+            width: 100%;
+            position: relative;
+            z-index: 5;
+        }
+        #header h1, #header h2, #header p {
+            font-weight:normal;
+            margin: 0;
+            padding: 2vh 2vw;
+            text-align: center;
+        }
+        #footer {
+            width: 100%;
+            min-height: 5vh;
+            padding-top: 2vh;
+            padding-bottom: 2vh;
+            text-align: center;
+            line-height: 25px;
+            font-size: 13px;
+            position: relative;
+            z-index: 5;
+        }
+        #features {
+            padding-top: 10vh;
+            padding-bottom: 10vh;
+        }
+        .reg--under {
+            color: black;
+        }
+        .date {
+            background-image: linear-gradient(120deg, #CAC531 0%, #f3f9a7 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 0.2em;
+            background-position: 0 88%;
+            transition: background-size 0.25s ease-in;
+            border-radius: 4px;
+        }
+        .date:hover{
+            background-size: 100% 88%;
+        }
+        .byline{
+            font-size: 15px;
+        }
+        .underline--magical {
+            background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 0.2em;
+            background-position: 0 88%;
+            transition: background-size 0.25s ease-in;
+            border-radius: 4px;
+        }
+        .underline--magical:hover{
+            background-size: 100% 88%;
+        }
+        .hidden {
+            visibility: hidden;
+        }
+        .centered {
+            width: 50vw;
+            margin: 0 auto;
+        }
+        .lefty {
+            width: 33vw;
+            margin-left: 5vw;
+        }
+        .righty {
+            width: 33vw;
+            margin-left: 62vw;
+        }
+        .fully {
+            width: 100%;
+            margin: auto;
+        }
+        .light {
+            color: #444;
+            background-color: #fafafa;
+        }
+        .dark {
+            color: #fafafa;
+            background-color: #444;
+        }
+        .step {
+            padding-bottom: 50vh;
+            /* margin-bottom: 10vh; */
+            opacity: 0.25;
+        }
+        .step.active {
+            opacity: 0.9;
+        }
+
+        .step div {
+            padding:  25px 50px;
+            line-height: 25px;
+            font-size: 15px;
+            overflow: hidden;
+        
+        }
+
+        .step img {
+            width: 100%;
+        }
+        .fancy-border {
+            border: 25px solid #B88846;
+            border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='75' height='75'%3E%3Cg fill='none' stroke='%23B88846' stroke-width='2'%3E%3Cpath d='M1 1h73v73H1z'/%3E%3Cpath d='M8 8h59v59H8z'/%3E%3Cpath d='M8 8h16v16H8zM51 8h16v16H51zM51 51h16v16H51zM8 51h16v16H8z'/%3E%3C/g%3E%3Cg fill='%23B88846'%3E%3Ccircle cx='16' cy='16' r='2'/%3E%3Ccircle cx='59' cy='16' r='2'/%3E%3Ccircle cx='59' cy='59' r='2'/%3E%3Ccircle cx='16' cy='59' r='2'/%3E%3C/g%3E%3C/svg%3E") 25;
+        }
+
+
+        @media (max-width: 750px) {
+            .centered, .lefty, .righty, .fully {
+                width: 90vw;
+                margin: 0 auto;
+            }
+        }
+
+        /* Fix issue on mobile browser where scroll breaks  */
+        .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan, 
+        .mapboxgl-canvas-container.mapboxgl-touch-zoom-rotate.mapboxgl-touch-drag-pan .mapboxgl-canvas {
+            touch-action: unset;
+        }
+
+        </style>
+</head>
+
+
+<body>
+
+<div id="map"></div>
+<div id="story"></div>
+
+
+<script>
+var layerTypes = {
+    'fill': ['fill-opacity'],
+    'line': ['line-opacity'],
+    'circle': ['circle-opacity', 'circle-stroke-opacity'],
+    'symbol': ['icon-opacity', 'text-opacity'],
+    'raster': ['raster-opacity'],
+    'fill-extrusion': ['fill-extrusion-opacity'],
+    'heatmap': ['heatmap-opacity']
+}
+
+var alignments = {
+    'left': 'lefty',
+    'center': 'centered',
+    'right': 'righty',
+    'full': 'fully'
+}
+
+function getLayerPaintType(layer) {
+    var layerType = map.getLayer(layer).type;
+    return layerTypes[layerType];
+}
+
+function setLayerOpacity(layer) {
+    var paintProps = getLayerPaintType(layer.layer);
+    paintProps.forEach(function(prop) {
+        var options = {};
+        if (layer.duration) {
+            var transitionProp = prop + "-transition";
+            options = { "duration": layer.duration };
+            map.setPaintProperty(layer.layer, transitionProp, options);
+        }
+        map.setPaintProperty(layer.layer, prop, layer.opacity, options);
+    });
+}
+
+var story = document.getElementById('story');
+var features = document.createElement('div');
+features.setAttribute('id', 'features');
+
+var header = document.createElement('div');
+
+header.className = "head";
+header.setAttribute('id', 'head');
+console.log(header.id)
+
+const cats = [
+    "images/deca.jpeg",
+    "images/aeneid.jpeg",
+    "images/genesis.jpeg",
+    "images/lighthouse.jpeg",
+    "images/luke.jpeg",
+    "images/meta.jpeg",
+    "images/morrison.png",
+    "images/odyssey.jpg",
+    "images/othello.jpeg",
+    "images/prideandprejudice.jpeg",
+    "images/symposium.jpeg"
+]
+
+const cycleImages = (images, container, step) => {
+    images.forEach((image, index) => (
+    setTimeout(() => {
+        container.style.backgroundImage = `url(${image})`  
+    }, step * (index + 1))
+    ))
+    setTimeout(() => cycleImages(images, container, step), step * images.length)
+}
+
+cycleImages(cats, header, 3000)
+
+
+
+var config = {
+    style: 'mapbox://styles/lievan/ckni7gr4c0bhm17qnwrap838u',
+    accessToken: 'pk.eyJ1IjoibGlldmFuIiwiYSI6ImNrbmRydDdtbzJhYjkyd21sam45bmhybWoifQ.MXaypeOX-7O6OUpQuYp8Ew',
+    showMarkers: true,
+    markerColor: '#000000',
+    theme: 'light',
+    use3dTerrain: false,
+    title: '<span class="reg--under">Tibetan Cuisine in the U.S.</span>' ,
+    subtitle: '',
+    byline: '',
+    footer: '',
+    chapters: [],
+}
+
+{% for record in dyn_config['chapters'] %}
+    var newChapter = {
+        'id': "{{record['id']}}",
+        'alignment': "{{record['alignment']}}",
+        'hidden': false,
+        'title': "{{record['title']}}",
+        'date': "{{record['date']}}",
+        'image': "",
+        'description': "{{record['description']}}",
+        'location': {
+            'center': [{{record['location'][0]}}, {{record['location'][1]}}],
+            'zoom': 15,
+            'pitch': 60,
+            'bearing': 0,
+        },
+        'mapAnimation': 'flyTo',
+        'rotateAnimation': false,
+        'callback': '',
+        'onChapterEnter': [],
+        'onChapterEixt': []
+    }
+    console.log(newChapter)
+    config.chapters.push(newChapter)
+{% endfor %}
+
+console.log(config)
+
+if (config.title) {
+    var titleText = document.createElement('h1');
+    var span = document.createElement('span');
+    titleText.innerHTML = config.title;
+    header.appendChild(titleText);
+}
+
+if (config.subtitle) {
+    var subtitleText = document.createElement('h2');
+    subtitleText.innerHTML = config.subtitle;
+    header.appendChild(subtitleText);
+}
+
+if (config.byline) {
+    var bylineText = document.createElement('p');
+    bylineText.innerHTML = config.byline;
+    header.appendChild(bylineText);
+}
+
+if (header.innerText.length > 0) {
+    header.classList.add(config.theme);
+    header.setAttribute('id', 'header');
+    story.appendChild(header);
+}
+
+config.chapters.forEach((record, idx) => {
+    var container = document.createElement('div');
+    var chapter = document.createElement('div');
+    chapter.style.backgroundColor ="rgb(255, 255, 255, 0.97)"
+    chapter.className = "fancy-border";
+    if (record.title) {
+        var title = document.createElement('h3');
+        title.innerHTML = record.title;
+        chapter.appendChild(title);
+    }
+    if (record.date){
+        var date = document.createElement('h4');
+        date.innerHTML = record.date;
+        chapter.appendChild(date);
+    }
+    if (record.image) {
+        var image = new Image();
+        image.style.border = "px solid #555"
+
+        image.src = record.image;
+        chapter.appendChild(image);
+    }
+
+    if (record.description) {
+        var story = document.createElement('p');
+        story.innerHTML = record.description;
+        chapter.appendChild(story);
+    }
+
+    container.setAttribute('id', record.id);
+    container.classList.add('step');
+    if (idx === 0) {
+        container.classList.add('active');
+    }
+
+    chapter.classList.add(config.theme);
+    container.appendChild(chapter);
+    container.classList.add(alignments[record.alignment] || 'centered');
+    if (record.hidden) {
+        container.classList.add('hidden');
+    }
+    features.appendChild(container);
+});
+
+story.appendChild(features);
+
+var footer = document.createElement('div');
+
+if (config.footer) {
+    var footerText = document.createElement('p');
+    footerText.innerHTML = config.footer;
+    footer.appendChild(footerText);
+}
+
+if (footer.innerText.length > 0) {
+    footer.classList.add(config.theme);
+    footer.setAttribute('id', 'footer');
+    story.appendChild(footer);
+}
+
+mapboxgl.accessToken = config.accessToken;
+
+const transformRequest = (url) => {
+    const hasQuery = url.indexOf("?") !== -1;
+    const suffix = hasQuery ? "&pluginName=scrollytellingV2" : "?pluginName=scrollytellingV2";
+    return {
+      url: url + suffix
+    }
+}
+
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: config.style,
+    center: config.chapters[0].location.center,
+    zoom: config.chapters[0].location.zoom,
+    bearing: config.chapters[0].location.bearing,
+    pitch: config.chapters[0].location.pitch,
+    interactive: false,
+    transformRequest: transformRequest
+});
+
+
+
+
+if (config.showMarkers) {
+    var marker = new mapboxgl.Marker({ color: config.markerColor });
+    marker.setLngLat(config.chapters[0].location.center).addTo(map);
+}
+
+// instantiate the scrollama
+var scroller = scrollama();
+
+map.on("load", function() {
+    if (config.use3dTerrain) {
+        map.addSource('mapbox-dem', {
+            'type': 'raster-dem',
+            'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+            'tileSize': 512,
+            'maxzoom': 14
+        });
+        // add the DEM source as a terrain layer with exaggerated height
+        map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+        // add a sky layer that will show when the map is highly pitched
+        map.addLayer({
+            'id': 'sky',
+            'type': 'sky',
+            'paint': {
+                'sky-type': 'atmosphere',
+                'sky-atmosphere-sun': [0.0, 0.0],
+                'sky-atmosphere-sun-intensity': 15
+            }
+        });
+    };
+
+    var layers = map.getStyle().layers;
+    var labelLayerId;
+    for (var i = 0; i < layers.length; i++) {
+        if (layers[i].type === 'symbol' && layers[i].layout['text-field']) {
+            labelLayerId = layers[i].id;
+            break;
+        }
+    }
+
+
+    // setup the instance, pass callback functions
+    scroller
+    .setup({
+        step: '.step',
+        offset: 0.5,
+        progress: true
+    })
+    .onStepEnter(response => {
+
+        var chapter = config.chapters.find(chap => chap.id === response.element.id);
+
+        console.log("heres the cahpter")
+        console.log(chapter)
+
+        response.element.classList.add('active');
+        map[chapter.mapAnimation || 'flyTo'](chapter.location);
+        if (config.showMarkers) {
+            marker.setLngLat(chapter.location.center);
+        }
+        if (chapter.onChapterEnter.length > 0) {
+            chapter.onChapterEnter.forEach(setLayerOpacity);
+        }
+        if (chapter.callback) {
+            window[chapter.callback]();
+        }
+        if (chapter.rotateAnimation) {
+            map.once('moveend', function() {
+                const rotateNumber = map.getBearing();
+                map.rotateTo(rotateNumber + 90, {
+                    duration: 24000, easing: function (t) {
+                        return t;
+                    }
+                });
+            });
+        }
+    })
+    .onStepExit(response => {
+        var chapter = config.chapters.find(chap => chap.id === response.element.id);
+        response.element.classList.remove('active');
+        if (chapter.onChapterExit.length > 0) {
+            chapter.onChapterExit.forEach(setLayerOpacity);
+        }
+    });
+});
+
+// setup resize event
+window.addEventListener('resize', scroller.resize);
+
+</script>
+
+</body>
+</html>
