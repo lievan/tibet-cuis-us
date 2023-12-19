@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title>Tibetan Cuisine in the U.S.</title>
+    <title>Tibetan Cuisine in the United States</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css' rel='stylesheet' />
@@ -19,7 +19,7 @@
             width: 100%;
             height: 100vh;
             margin-bottom: 40px;
-            background-image: url('https://media.istockphoto.com/id/1356338670/vector/nepal-cartoon-vector-doodle-illustration.jpg?s=612x612&w=0&k=20&c=Ky0YqHXx0P-hDY98mMGZ5K6MFkVtFxXGL7oR74YoJ1U=');
+            background-image: url('https://driftingcloudsnet.files.wordpress.com/2021/02/pxl_20210220_035842852.jpg');
             background-position: center center;
             background-attachment: fixed;
             background-size: cover;
@@ -36,7 +36,7 @@
         }
         h1 {
             width: 725px;
-            border: 25px solid #B88846;
+            border: 25px solid hsl(22, 88%, 90%);
 
             background-color:#FFFBED;
             position: static;
@@ -94,6 +94,14 @@
             font-size: 13px;
             position: relative;
             z-index: 5;
+        }
+        #intro {
+            width: 80%;
+            text-align: center;
+            font-weight: 550;
+        }
+        #conclusion {
+            width: 80%;
         }
         #features {
             padding-top: 10vh;
@@ -175,7 +183,7 @@
             width: 100%;
         }
         .fancy-border {
-            border: 25px solid #B88846;
+            border: 15px solid hsl(22, 88%, 90%);
         }
 
 
@@ -257,7 +265,7 @@ var config = {
     markerColor: '#000000',
     theme: 'light',
     use3dTerrain: false,
-    title: '<span class="reg--under">Exploring Tibetan Cuisine in the U.S.</span>' ,
+    title: 'A Tour of Tibetan Cuisine in the United States' ,
     subtitle: '',
     byline: '',
     footer: '',
@@ -270,10 +278,10 @@ var config = {
         'alignment': "{{record['alignment']}}",
         'hidden': false,
         'title': "{{record['title']}}",
-        'date': "{{record['date']}}",
+        'date': "{{record['date']|safe}}",
         'image': "",
         "link": "{{record['link']}}",
-        'description': "{{record['description']}}",
+        'description': "{{record['description']|safe|replace('\n', '\\n')}}",
         'location': {
             'center': [{{record['location'][0]}}, {{record['location'][1]}}],
             'zoom': 15,
@@ -295,7 +303,7 @@ console.log(config)
 if (config.title) {
     var titleText = document.createElement('h1');
     var span = document.createElement('span');
-    titleText.innerHTML = config.title;
+    titleText.innerHTML = config.title + "<p class=byline>Fall 2023 Introduction to Tibetan Civilization Final Project by Evan Li</p>";
     header.appendChild(titleText);
 }
 
@@ -324,7 +332,11 @@ config.chapters.forEach((record, idx) => {
     chapter.className = "fancy-border";
     if (record.title) {
         var title = document.createElement('h3');
-        title.innerHTML = "<a class='underline--magical' href=" + record.link + ">" + record.title + "</a>";
+        if (idx != 0) {
+            title.innerHTML = "<a class='underline--magical' href=" + record.link + ">" + record.title + "</a>";
+        } else {
+            title.innerHTML = "<a href=" + record.link + ">" + record.title + "</a>";
+        }
         chapter.appendChild(title);
     }
     if (record.date){
@@ -454,9 +466,6 @@ map.on("load", function() {
     .onStepEnter(response => {
 
         var chapter = config.chapters.find(chap => chap.id === response.element.id);
-
-        console.log("heres the cahpter")
-        console.log(chapter)
 
         response.element.classList.add('active');
         map[chapter.mapAnimation || 'flyTo'](chapter.location);

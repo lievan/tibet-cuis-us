@@ -2,6 +2,9 @@ from flask import Flask, render_template, url_for
 import requests
 from dotenv import load_dotenv
 import os
+import csv
+import pandas as pd
+from io import StringIO
 
 load_dotenv()
 
@@ -18,39 +21,74 @@ SHEET_URL = get_sheet_url("1eo6L93Ck9Uz4EPqcXWxqfKpV2ndP2dfXJ_QapGoxMRs")
 
 @app.route("/")
 def index():
-    
-    data = []
     r = requests.get(SHEET_URL)
     if r.status_code != 200:
         return "Error"
-    decoded = r.content.decode('utf-8')
-    for line in decoded.split('\n')[1:]:
-        line = line.strip()
-        vals = line.split(',')
-        new_rest = {}
-        new_rest['name'] = vals[0]
-        new_rest['city'] = vals[1]
-        new_rest['location'] = [int(vals[2]), int(vals[3])]
-        new_rest['description'] = vals[4]
-        new_rest['link'] = vals[5]
-        data.append(new_rest)
-
+    decoded = r.content.decode()
+    df = pd.read_csv(StringIO(decoded))
     chapters = []
-
-    for i,rest in enumerate(data):
-        rest_data = {'id': rest['name'],
+    header_data = {'id': 'intro',
+                    'alignment': 'center',
+                    'hidden': False,
+                    'title': '',
+                    'link': '',
+                    'date':"",
+                    'image': '',
+                    'description': """This web app provides a tour of Tibetan food in the United States, starting in New York.
+                                      Scroll slowly to jump from restaraunt to restaraunt.<br><br>
+                                      The restaraunts were found from a variety of sources, such as this
+                                      <a href=https://www.farandwide.com/s/best-tibetan-restaurants-usa-074f18478b4c41eb>article</a> 
+                                      on America's top Tibetan Restaraunts.<br><br>
+                                      Related links are at the bottom of the website.
+                                      <br><br>
+                                      If you would like to add a restaraunt to this site, please use 
+                                      this <a href=https://forms.gle/brPyQYc1KKzEvmkR8>Google Form</a>.
+                                      <br><br>
+                                      For more resources on Tibetan culture, feel free to check out this
+                                      <a href=https://tibetanculture.weai.columbia.edu/>Tibetan Culture</a> by Columbia's Tibetan studies department""",
+                    'location': [-73.963036, 40.807384],
+                    'mapAnimation': 'flyTo',
+                    'rotateAnimation': False,
+                    'callback': ''
+                }
+    footer_data = {'id': 'conclusion',
+                    'alignment': 'center',
+                    'hidden': False,
+                    'title': '',
+                    'link': '',
+                    'date':"Related links",
+                    'image': '',
+                    'description': """
+                                      <a href=https://www.farandwide.com/s/best-tibetan-restaurants-usa-074f18478b4c41eb>America's 
+                                        Top Tibetan Restaurants Will Have You Asking for Seconds</a> 
+                                        <br><br>
+                                      <a href=https://tibetanculture.weai.columbia.edu/tibetan-cuisine-nyc/>
+                                        Tibetan Cuisine in NYC</a> 
+                                        <br><br>
+                                      <a href=https://driftingclouds.net/2021/03/28/34-province-project-tibet-%E8%A5%BF%E8%97%8F/>
+                                        Header Background Image Source</a> 
+                                    """,
+                    'location': [40.8075, 73.9626],
+                    'mapAnimation': 'flyTo',
+                    'rotateAnimation': False,
+                    'callback': ''
+                }
+    chapters.append(header_data)
+    for i, row in df.iterrows():
+        rest_data = {'id': row['name'],
             'alignment': 'right' if i%2==0 else 'left',
             'hidden': False,
-            'title': rest['name'],
-            'link': rest['link'],
-            'date': rest['city'],
+            'title': row['name'],
+            'link': row['link'],
+            'date': row['city'] + ', ' + row['state'],
             'image': '',
-            'description': rest['description'],
-            'location': rest['location'],
+            'description': row['description'].replace('"', '').strip(),
+            'location': [float(row['long']), float(row['lat'])],
             'mapAnimation': 'flyTo',
             'rotateAnimation': False,
             'callback': ''}
         chapters.append(rest_data)
+    chapters.append(footer_data)
     return render_template('index.html', chapters=chapters, MAPBOX_KEY =MAPBOX_KEY )
 
 if __name__ == "__main__":
