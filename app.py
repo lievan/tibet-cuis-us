@@ -1,5 +1,12 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+MAPBOX_KEY = os.getenv('mapboxkey')
+
 app = Flask(__name__)
 
 
@@ -25,26 +32,17 @@ def index():
         new_rest['city'] = vals[1]
         new_rest['location'] = [int(vals[2]), int(vals[3])]
         new_rest['description'] = vals[4]
-        print(new_rest)
+        new_rest['link'] = vals[5]
         data.append(new_rest)
 
-    app_data = {'style': 'mapbox://styles/lievan/ckni7gr4c0bhm17qnwrap838u',
-        'accessToken': 'pk.eyJ1IjoibGlldmFuIiwiYSI6ImNrbmRydDdtbzJhYjkyd21sam45bmhybWoifQ.MXaypeOX-7O6OUpQuYp8Ew',
-        'showMarkers': True,
-        'markerColor': '#000000',
-        'theme': 'light',
-        'use3dTerrain': False,
-        'title': 'Tibetan Cuisine in the U.S.' ,
-        'subtitle': 'Subtitle',
-        'byline': 'Byline',
-        'footer': 'Footer',
-        'chapters': []}
+    chapters = []
 
     for i,rest in enumerate(data):
         rest_data = {'id': rest['name'],
             'alignment': 'right' if i%2==0 else 'left',
             'hidden': False,
             'title': rest['name'],
+            'link': rest['link'],
             'date': rest['city'],
             'image': '',
             'description': rest['description'],
@@ -52,8 +50,8 @@ def index():
             'mapAnimation': 'flyTo',
             'rotateAnimation': False,
             'callback': ''}
-        app_data['chapters'].append(rest_data)
-    return render_template('index.html', dyn_config=app_data)
+        chapters.append(rest_data)
+    return render_template('index.html', chapters=chapters, MAPBOX_KEY =MAPBOX_KEY )
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port = 8000, debug=True)
