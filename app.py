@@ -34,12 +34,20 @@ def index():
                     'link': '',
                     'date':"",
                     'image': '',
-                    'description': """This web app provides a tour of Tibetan food in the United States, starting in New York.
-                                      Scroll slowly to jump from restaraunt to restaraunt.<br><br>
-                                      The restaraunts were found from a variety of sources, such as this
+                    'description': """This web app provides a tour of Tibetan food in the United States.
+                                      Scroll slowly to jump from restaurants to restaurants.<br><br>
+                                      The restaraunts were found from a variety of sources, primarily inspired by this
                                       <a href=https://www.farandwide.com/s/best-tibetan-restaurants-usa-074f18478b4c41eb>article</a> 
-                                      on America's top Tibetan Restaraunts.<br><br>
-                                      Related links are at the bottom of the website.
+                                      on America's top Tibetan Restaraunts. Related links are at the bottom of the website.
+                                      <br><br>
+                                      The following restaurants showcase a variety of authentic Tibetan dishes and demonstrate how
+                                      Tibetan cuisine has adapted to different environments in the states, ranging from
+                                      immigrant hubs such as Queens to places where the Tibetan community is not prominent.
+                                      Many of the owners and chefs mentioned below have a unique journey in the restaurant industry, 
+                                      gaining experience in a variety of different cuisines after moving to the states before opening 
+                                      their own establishments. You'll often see the menus of these 
+                                      restaurants also including American-Chinese food, Indian food, and Nepalese food and utilizing  concepts
+                                      such as set menus, buffets, and more.
                                       <br><br>
                                       If you would like to add a restaraunt to this site, please use 
                                       this <a href=https://forms.gle/brPyQYc1KKzEvmkR8>Google Form</a>.
@@ -68,7 +76,7 @@ def index():
                                       <a href=https://driftingclouds.net/2021/03/28/34-province-project-tibet-%E8%A5%BF%E8%97%8F/>
                                         Header Background Image Source</a> 
                                     """,
-                    'location': [40.8075, 73.9626],
+                    'location': [-73.9626, 40.8075],
                     'mapAnimation': 'flyTo',
                     'rotateAnimation': False,
                     'callback': ''
@@ -82,7 +90,7 @@ def index():
             'link': row['link'],
             'date': row['city'] + ', ' + row['state'],
             'image': '',
-            'description': row['description'].replace('"', '').strip(),
+            'description': row['description'].replace('"', '').strip().replace("\n", "<br>"),
             'location': [float(row['long']), float(row['lat'])],
             'mapAnimation': 'flyTo',
             'rotateAnimation': False,
