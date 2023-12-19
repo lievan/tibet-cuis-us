@@ -279,7 +279,7 @@ var config = {
         'hidden': false,
         'title': "{{record['title']}}",
         'date': "{{record['date']|safe}}",
-        'image': "",
+        'image': "{{record['image']|safe}}",
         "link": "{{record['link']}}",
         'description': "{{record['description']|safe|replace('\n', '\\n')}}",
         'location': {
@@ -303,7 +303,7 @@ console.log(config)
 if (config.title) {
     var titleText = document.createElement('h1');
     var span = document.createElement('span');
-    titleText.innerHTML = config.title + "<p class=byline>Fall 2023 Introduction to Tibetan Civilization Final Project by Evan Li</p>";
+    titleText.innerHTML = config.title + "<p class=byline>Fall 2023, Introduction to Tibetan Civilization Final Project by Evan Li<br style='margin-top:-20'><a href=https://driftingclouds.net/2021/03/28/34-province-project-tibet-%E8%A5%BF%E8%97%8F/>(background image source)</a></p>";
     header.appendChild(titleText);
 }
 
@@ -345,6 +345,7 @@ config.chapters.forEach((record, idx) => {
         chapter.appendChild(date);
     }
     if (record.image) {
+        console.log(record.image)
         var image = new Image();
         image.style.border = "px solid #555"
 

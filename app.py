@@ -18,7 +18,6 @@ def get_sheet_url(sheet_id):
 
 SHEET_URL = get_sheet_url("1eo6L93Ck9Uz4EPqcXWxqfKpV2ndP2dfXJ_QapGoxMRs")
 
-
 @app.route("/")
 def index():
     r = requests.get(SHEET_URL)
@@ -73,8 +72,8 @@ def index():
                                       <a href=https://tibetanculture.weai.columbia.edu/tibetan-cuisine-nyc/>
                                         Tibetan Cuisine in NYC</a> 
                                         <br><br>
-                                      <a href=https://driftingclouds.net/2021/03/28/34-province-project-tibet-%E8%A5%BF%E8%97%8F/>
-                                        Header Background Image Source</a> 
+                                        <a href=https://www.eater.com/search?q=Tibet/>
+                                        Eater Articles on Tibetan Cuisine</a> 
                                     """,
                     'location': [-73.9626, 40.8075],
                     'mapAnimation': 'flyTo',
@@ -83,13 +82,14 @@ def index():
                 }
     chapters.append(header_data)
     for i, row in df.iterrows():
+        print(row['image'])
         rest_data = {'id': row['name'],
             'alignment': 'right' if i%2==0 else 'left',
             'hidden': False,
             'title': row['name'],
             'link': row['link'],
             'date': row['city'] + ', ' + row['state'],
-            'image': '',
+            'image': row['image'],
             'description': row['description'].replace('"', '').strip().replace("\n", "<br>"),
             'location': [float(row['long']), float(row['lat'])],
             'mapAnimation': 'flyTo',
